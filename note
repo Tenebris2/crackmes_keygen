@@ -1,0 +1,180 @@
+String contains your username
+
+First after checking for length:
+
+load effective address of String(username) into edx
+push edx into the stack -> stack now contains the address to String
+call for string length
+
+general idea for first part is 
+
+changing the string from 1 to size => new string
+byte_406327: 1 index behind byte_406328 
+byte_406327 -> [0,AA,89,C4,FE]
+                |-> This is byte_406327
+byte_406328(static data): AA 89 C4 FE
+byte_406327(1 bit(index) in front of byte_406328)
+1: create a xor between byte_406328[eax] and bl -> stores it in bl
+2: increment eax
+3: compare eax to 5
+4: replace characters in old string at the index esi
+5: move byte_406327[eax], ecx
+6:
+7: increment esi
+8: compare esi and ebp (string length)
+9: ends when the loop increments to the length of the string
+
+
+=> Arr[0,AA,889,C4,FE]
+
+STRING -> tenebris-> start from e 
+eax = 0, esi = 0
+ecx = String[eax + 1] = 'e'
+ebx = ecx
+ebx = XOR(ebx, byte_406328[eax]) // byte_406328[eax] = AA
+eax++
+compare eax with 5 -> set zf flag = 1
+String[esi] = ebx 
+if zf_flag = 1 jump to clear eax else continue:
+esi++;
+compare esi with ebp //ebp = string_length
+if esi < ebp break then jump to next code
+
+so byte_406328 contains the current String[eax]
+
+int eax = 0
+int esi = 0
+int ecx = 0
+int ebx = 0
+    #   -1 0   1  2  3  4
+arr = [0,AA,889,C4,FE,46]
+while (esi < strlen(username)) {
+    ecx = username[esi + 1]
+    ebx = XOR(ecx, arr[eax])
+    eax++
+
+    if (eax == 5) eax = 0
+    username[esi + 1] = ebx
+    arr[eax - 1] = ecx
+
+    esi++
+}
+second part is:
+
+premade parts:
+
+.data:0040632C byte_40632C     db 72h                  ; DATA XREF: DialogFunc+103↑w
+.data:0040632D ; char byte_40632D[4]
+.data:0040632D byte_40632D     db 78h                  ; DATA XREF: DialogFunc:loc_4011A3↑r
+.data:0040632E                 db 0F0h
+.data:0040632F                 db 0D0h
+.data:00406330                 db    3
+.data:00406331 ; char byte_406331[]
+.data:00406331 byte_406331     db 0E7h   
+
+
+.text:004011D1 mov     al, [edx+edi]
+.text:004011D4 mov     cl, byte_406332[esi]
+.text:004011DA xor     cl, al
+.text:004011DC inc     esi
+.text:004011DD mov     [edx+edi], cl
+.text:004011E0 mov     byte_406331[esi], al
+.text:004011E6 cmp     esi, 5
+.text:004011E9 jnz     short loc_4011ED
+.text:004011EB xor     esi, esi
+.text:004011ED
+.text:004011ED loc_4011ED:                             ; CODE XREF: DialogFunc+135↑j
+.text:004011ED inc     edi
+.text:004011EE cmp     edi, ebp
+.text:004011F0 jb      short loc_4011D1
+.text:004011F2
+.text:004011F2 loc_4011F2:                             ; CODE XREF: DialogFunc+11B↑j
+.text:004011F2 xor     edi, edi
+.text:004011F4 xor     ecx, ecx
+.text:004011F6 test    ebp, ebp
+.text:004011F8 jbe     short loc_401220
+
+
+.data:00406336 byte_406336     db 37h                  ; DATA XREF: DialogFunc+15A↑w
+.data:00406337 byte_406337     db 0B5h                 ; DATA XREF: DialogFunc:loc_4011FA↑r
+.data:00406338                 db  1Bh
+.data:00406339                 db 0C9h
+.data:0040633A                 db  50h ; P
+.data:0040633B                 db  73h ; s
+
+.text:004011FA                 mov     bl, byte_406337[edi]
+.text:00401200                 mov     esi, ebp
+.text:00401202                 sub     esi, ecx
+.text:00401204                 dec     esi
+.text:00401205                 mov     al, [edx+esi]
+.text:00401208                 xor     bl, al
+.text:0040120A                 inc     edi
+.text:0040120B                 mov     [edx+esi], bl
+.text:0040120E                 mov     byte_406336[edi], al
+.text:00401214                 cmp     edi, 5
+.text:00401217                 jnz     short loc_40121B
+.text:00401219                 xor     edi, edi
+.text:0040121B loc_40121B:                             ; CODE XREF: DialogFunc+163↑j
+.text:0040121B                 inc     ecx
+.text:0040121C                 cmp     ecx, ebp
+.text:0040121E                 jb      short loc_4011FA
+
+
+
+
+
+.text:00401236                 mov     ecx, eax
+.text:00401238                 and     ecx, 3
+.text:0040123B                 mov     bl, [edi+ecx]
+.text:0040123E                 lea     esi, [edi+ecx]
+.text:00401241                 mov     cl, [edx+eax]
+.text:00401244                 add     bl, cl
+.text:00401246                 inc     eax
+.text:00401247                 cmp     eax, ebp
+.text:00401249                 mov     [esi], bl
+.text:0040124B                 jb      short loc_401236
+.text:0040124D
+.text:0040124D loc_40124D:                             ; CODE XREF: DialogFunc+180↑j
+.text:0040124D                 pop     ebp
+.text:0040124E                 mov     ecx, 0Ah
+.text:00401253                 mov     eax, dword_406345
+.text:00401258                 xor     ebx, ebx
+
+
+
+
+
+.text:00401220                 lea     edi, dword_406345
+.text:00401226                 xor     eax, eax
+.text:00401228                 test    ebp, ebp
+.text:0040122A                 mov     dword_406345, 0
+.text:00401234                 jbe     short loc_40124D
+.text:00401236
+.text:00401236 loc_401236:                             ; CODE XREF: DialogFunc+197↓j
+.text:00401236                 mov     ecx, eax
+.text:00401238                 and     ecx, 3
+.text:0040123B                 mov     bl, [edi+ecx]
+.text:0040123E                 lea     esi, [edi+ecx]
+.text:00401241                 mov     cl, [edx+eax]
+.text:00401244                 add     bl, cl
+.text:00401246                 inc     eax
+.text:00401247                 cmp     eax, ebp
+.text:00401249                 mov     [esi], bl
+.text:0040124B                 jb      short loc_401236
+.text:0040124D
+.text:0040124D loc_40124D:                             ; CODE XREF: DialogFunc+180↑j
+.text:0040124D                 pop     ebp
+.text:0040124E                 mov     ecx, 0Ah
+.text:00401253                 mov     eax, dword_406345
+.text:00401258                 xor     ebx, ebx
+
+
+
+.text:0040125A                 xor     edx, edx
+.text:0040125C                 div     ecx
+.text:0040125E                 add     dl, 30h ; '0'
+.text:00401261                 mov     String1[ebx], dl
+.text:00401267                 inc     ebx
+.text:00401268                 test    eax, eax
+.text:0040126A                 jnz     short loc_40125A
+.text:0040126C                 push    offset String1  ; lpString
