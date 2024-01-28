@@ -178,3 +178,13 @@ premade parts:
 .text:00401268                 test    eax, eax
 .text:0040126A                 jnz     short loc_40125A
 .text:0040126C                 push    offset String1  ; lpString
+
+0xffffc97c - 0x8c = 0xffffc8f0
+
+address:  0xffffc967
+//decimal: 67305985
+//hex: 0x04030201
+
+//shl ver: 0x8060402
+
+1345 14511
